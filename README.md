@@ -1,0 +1,3 @@
+# Typescript Watch Playground
+
+This is a simple project that I'm using to play around with [the typescript incremental program watch API](https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#writing-an-incremental-program-watcher). The aim is to discover ways to improve the performance of `parcel2`'s `validator-typescript` plugin (see [discussion in parcel PR 4404 for details](https://github.com/parcel-bundler/parcel/pull/4404)).
