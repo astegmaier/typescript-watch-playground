@@ -1,4 +1,5 @@
-import ts from "typescript";
+import ts, { System } from "typescript";
+import path from "path";
 
 import { afterProgramCreate } from "./afterProgramCreate";
 import { reportDiagnostic, reportWatchStatusChanged } from "./reporters";
@@ -8,6 +9,12 @@ function watchMain() {
   if (!configPath) {
     throw new Error("Could not find a valid 'tsconfig.json'.");
   }
+
+  const rootFiles: string[] = [path.resolve("project/src/index.ts")];
+  const options: ts.CompilerOptions = { strict: true };
+  const system: System = ts.sys;
+  const projectReferences: readonly ts.ProjectReference[] | undefined = undefined;
+  const watchOptions: ts.WatchOptions | undefined = undefined;
 
   // TypeScript can use several different program creation "strategies":
   //  * ts.createEmitAndSemanticDiagnosticsBuilderProgram,
@@ -21,7 +28,16 @@ function watchMain() {
   const createProgram = ts.createSemanticDiagnosticsBuilderProgram;
 
   // Note that there is another overload for `createWatchCompilerHost` that takes a set of root files.
-  const host = ts.createWatchCompilerHost(configPath, {}, ts.sys, createProgram, reportDiagnostic, reportWatchStatusChanged);
+  const host = ts.createWatchCompilerHost(
+    rootFiles,
+    options,
+    system,
+    createProgram,
+    reportDiagnostic,
+    reportWatchStatusChanged,
+    projectReferences,
+    watchOptions
+  );
 
   // You can technically override any given hook on the host, though you probably don't need to.
   // Note that we're assuming `origCreateProgram` and `origPostProgramCreate` doesn't use `this` at all.
