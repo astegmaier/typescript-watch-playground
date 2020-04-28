@@ -1,5 +1,5 @@
 function myFunc(param: string) {
-    console.log(param);
+  console.log(param);
 }
 
 myFunc(123);
