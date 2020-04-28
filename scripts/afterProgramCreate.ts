@@ -5,8 +5,11 @@ import {
   createCompilerDiagnostic,
   getWatchErrorSummaryDiagnosticMessage,
   getErrorCountForSummary,
+  summarizeSourceFiles,
 } from "./helpers";
 import { reportDiagnostic } from "./reporters";
+
+let runCount = 0;
 
 // We are over-riding the default implementation of afterProgramCreate with our own version that doesn't emit files.
 // Most of the code is copied from ts emitFilesAndReportErrors, with the 'emit' code removed (https://github.com/microsoft/TypeScript/blob/167f954ec7cf456238cad4f2006fb330c53bba8e/src/compiler/watch.ts#L140-L200)
@@ -22,7 +25,10 @@ export function afterProgramCreate(
 
   // TODO: figure out whether we need to pipe through a cancellation token
   let cancellationToken: ts.CancellationToken | undefined = undefined;
-
+  const thisRun = runCount;
+  runCount++;
+  console.log(`RUN ${thisRun}: program.getSourceFiles() included:\n`, summarizeSourceFiles(program.getSourceFiles()));
+  console.time(`RUN ${thisRun}: got all Diagnostics`);
   // First get and report any syntactic errors.
   const allDiagnostics = program.getConfigFileParsingDiagnostics().slice();
   const configFileParsingDiagnosticsLength = allDiagnostics.length;
@@ -40,6 +46,7 @@ export function afterProgramCreate(
       }
     }
   }
+  console.timeEnd(`RUN ${thisRun}: got all Diagnostics`);
 
   // This is the code we removed from the original implementation to avoid emit.
   // TODO: remove this.
